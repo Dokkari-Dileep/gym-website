@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gym Membership Registration</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h2>Gym Membership Registration</h2>
+        <form action="#" method="post" enctype="multipart/form-data">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required />
+
+            <label for="age">Age</label>
+            <input type="number" id="age" name="age" min="0" required />
+
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" required />
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required />
+
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required />
+
+            <label for="membership">Membership Type</label>
+            <select id="membership" name="membership" required>
+                <option value="">-- Select --</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+
+            <label for="transactionId">Transaction Id</label>
+            <input type="text" id="transaction" name="transaction" required />
+
+            <label>Scan Payment QR Code</label>
+            <div id="reader" style="width: 500px;"></div>
+            <img src="scanner.jpg" alt="Static QR Code" id="static-qr" />
+            <input type="hidden" id="paymentCode" name="paymentCode" />
+
+            <button class="but" type="submit">Submit Registration</button>
+        </form>
+    </div>
+
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+    <script>
+        // Initialize EmailJS
+        (function () {
+            emailjs.init("DVQ2qHXMEDkhS92Ys"); // replace with your EmailJS Public Key
+        })();
+
+        const form = document.querySelector("form");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            emailjs.sendForm("service_md3pvbp", "template_vxbjc3o", this)
+                .then(() => {
+                    alert("✅ Registration submitted successfully!.");
+                }, (error) => {
+                    alert("❌ Failed to send: " + error.text);
+                });
+        });
+
+
+        // QR Scanner init
+        function onScanSuccess(decodedText) {
+            document.getElementById("paymentCode").value = decodedText;
+            alert("Payment code scanned: " + decodedText);
+            console.log(paymentCode); // or console.log(amount);
+
+        }
+
+
+        function onScanFailure(error) {
+            console.warn(`QR error = ${error}`);
+        }
+
+        if (document.getElementById("reader")) {
+            let html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", { fps: 10, qrbox: 150 }
+            );
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
+
+        // Receipt preview
+        document.getElementById("receipt").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("receipt-preview").innerHTML =
+                        `<img src="${e.target.result}" width="200" />`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+
+    </script>
+    <!-- </script> -->
+</body>
+
+</html>
